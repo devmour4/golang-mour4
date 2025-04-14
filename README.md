@@ -1,2 +1,2 @@
 # golang-mour4
- primeiro repositório curso go
+projetos curso go
