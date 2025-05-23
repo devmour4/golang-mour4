@@ -1,0 +1,86 @@
+    package main
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"github.com/gorilla/mux"
+)
+
+// Definição da struct Person
+type Person struct {
+	ID        string  `json:"id,omitempty"`
+	Firstname string  `json:"firstname,omitempty"`
+	Lastname  string  `json:"lastname,omitempty"`
+	Address   *Address `json:"address,omitempty"`
+}
+
+// Definição da struct Address
+type Address struct {
+	City  string `json:"city,omitempty"`
+	State string `json:"state,omitempty"`
+}
+
+// Lista de pessoas (simulação de banco de dados)
+var people []Person
+
+// Função para retornar todas as pessoas (GET /contato)
+func GetPeople(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(people)
+}
+
+// Função para retornar uma pessoa específica (GET /contato/{id})
+func GetPerson(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	for _, item := range people {
+		if item.ID == params["id"] {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(&Person{})
+}
+
+// Função para criar uma nova pessoa (POST /contato/{id})
+func CreatePerson(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var person Person
+	_ = json.NewDecoder(r.Body).Decode(&person)
+	person.ID = params["id"]
+	people = append(people, person)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(people)
+}
+
+// Função para deletar uma pessoa (DELETE /contato/{id})
+func DeletePerson(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	for index, item := range people {
+		if item.ID == params["id"] {
+			people = append(people[:index], people[index+1:]...)
+			break
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(people)
+}
+
+func main() {
+	// Criando o roteador
+	router := mux.NewRouter()
+
+	// Adicionando pessoas fictícias
+	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
+	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
+
+	// Definição das rotas
+	router.HandleFunc("/contato", GetPeople).Methods("GET")
+	router.HandleFunc("/contato/{id}", GetPerson).Methods("GET")
+	router.HandleFunc("/contato/{id}", CreatePerson).Methods("POST")
+	router.HandleFunc("/contato/{id}", DeletePerson).Methods("DELETE")
+
+	// Inicializando o servidor
+	log.Fatal(http.ListenAndServe(":8000", router))
+}

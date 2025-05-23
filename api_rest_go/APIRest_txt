@@ -1,2 +1,43 @@
 É para usar o pacote gorilla mux, por acaso eu já instalei ele no diretorio.
 pesquisar sobre ele e como utilizar ele dentro da api
+
+**Preciso criar uma estrutura das Pessoas que vai conter informações das Pessoas
+
+Algumas informações que posso colocar
+
+Nome
+Sobrenome
+Endereço
+	Estado
+	Cidade
+	Rua
+Telefone	
+
+Entendi! Vou te ajudar a construir sua API passo a passo, incentivando seu raciocínio sem entregar as respostas diretas. Vamos analisar os componentes principais da solução e estruturar juntos a lógica do código.
+
+### Estrutura Geral
+A API parece seguir um padrão REST básico usando **Go** e o framework **Gorilla Mux**. Os principais elementos incluem:
+- Um **struct** para modelar os dados da pessoa (**Person** e **Address**).
+- Manipulação de rotas para **CRUD** (Create, Read, Update, Delete).
+- Uso de JSON para comunicação entre cliente e servidor.
+- Função `main` para iniciar o servidor.
+
+### Pontos-chave para Implementação
+1. **Definição das structs**
+   - Como organizar os atributos corretamente?
+   - Como utilizar tags JSON para garantir que os campos sejam serializados corretamente?
+
+2. **Manipulação das rotas**
+   - Como configurar cada método corretamente (`GET`, `POST`, `DELETE`)?
+   - Como extrair os parâmetros da URL?
+
+3. **Manipulação de dados**
+   - Como armazenar e recuperar registros da lista de pessoas?
+   - Como garantir que um novo contato seja adicionado corretamente?
+
+4. **Execução do servidor**
+   - Como iniciar a aplicação e garantir que ela fique rodando na porta correta?
+
+Se quiser, podemos começar revisando um desses pontos juntos. Qual parte você acha mais desafiadora no momento? 🚀
+
+
