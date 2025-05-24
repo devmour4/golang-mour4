@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"github.com/gorilla/mux"
 	"encoding/json"
@@ -25,7 +24,18 @@ func GetClients(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json") // Define o tipo de resposta como JSON
     json.NewEncoder(w).Encode(clients) // Converte a lista de pessoas para JSON e envia na resposta
 }
-func GetClient(w http.ResponseWriter, r *http.Request)
+func GetClient(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
+	
+	for _, item := range clients {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(&Person{})
+}
 
 func main() {
 	router := mux.NewRouter()
@@ -33,7 +43,7 @@ func main() {
 	//o router é a função que vai usar a porta, o handlefunc é pra acessar o local que vou direcionar
 	router.HandleFunc("/contact/", GetClients).Methods("GET") // Exibir todas as pessoas
 	router.HandleFunc("/contact/{id}", GetClient).Methods("GET") // Localizar pessoa por ID
-	router.HandleFunc("/contact/",) // Atualizar pessoa utiliza ID
-	router.HandleFunc("/contact/",) // Deletar pessoa utiliza ID
+	//router.HandleFunc("/contact/") // Atualizar pessoa utiliza ID
+	//router.HandleFunc("/contact/") // Deletar pessoa utiliza ID
 	http.ListenAndServe(":8000", router)
 }
