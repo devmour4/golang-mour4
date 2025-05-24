@@ -1,43 +1,21 @@
-É para usar o pacote gorilla mux, por acaso eu já instalei ele no diretorio.
-pesquisar sobre ele e como utilizar ele dentro da api
-
-**Preciso criar uma estrutura das Pessoas que vai conter informações das Pessoas
-
-Algumas informações que posso colocar
-
-Nome
-Sobrenome
-Endereço
-	Estado
-	Cidade
-	Rua
-Telefone	
-
-Entendi! Vou te ajudar a construir sua API passo a passo, incentivando seu raciocínio sem entregar as respostas diretas. Vamos analisar os componentes principais da solução e estruturar juntos a lógica do código.
-
-### Estrutura Geral
-A API parece seguir um padrão REST básico usando **Go** e o framework **Gorilla Mux**. Os principais elementos incluem:
-- Um **struct** para modelar os dados da pessoa (**Person** e **Address**).
-- Manipulação de rotas para **CRUD** (Create, Read, Update, Delete).
-- Uso de JSON para comunicação entre cliente e servidor.
-- Função `main` para iniciar o servidor.
-
-### Pontos-chave para Implementação
-1. **Definição das structs**
-   - Como organizar os atributos corretamente?
-   - Como utilizar tags JSON para garantir que os campos sejam serializados corretamente?
-
-2. **Manipulação das rotas**
-   - Como configurar cada método corretamente (`GET`, `POST`, `DELETE`)?
-   - Como extrair os parâmetros da URL?
-
-3. **Manipulação de dados**
-   - Como armazenar e recuperar registros da lista de pessoas?
-   - Como garantir que um novo contato seja adicionado corretamente?
-
-4. **Execução do servidor**
-   - Como iniciar a aplicação e garantir que ela fique rodando na porta correta?
-
-Se quiser, podemos começar revisando um desses pontos juntos. Qual parte você acha mais desafiadora no momento? 🚀
 
 
+
+Explicação da linha onde o JSON pega os dados do usuario, transforma em uma pessoa e armazena o objeto(a pessoa) convertido na variável client
+   err := json.NewDecoder(r.Body).Decode(&client) //pega os dados de requisição do body(json), transforma os JSON em uma pessoa (Person)
+	   if err != nil { 
+		http.Error(w, "Erro ao processar JSON: formato inválido", http.StatusBadRequest)
+	}
+
+   //como eu adcionei a variavel err na linha do json, e fiz o laço no if, eu verifico se tem erros e informo ao usuário se houve ou não um problema
+
+	🔹 json.NewDecoder(r.Body) cria um decodificador JSON que lê r.Body.
+   🔹 .Decode(&person) transforma os dados JSON no objeto Person dentro do Go
+
+Explicação da linha onde gero o ID do usuário automaticamente com base no tamanho da lista
+   client.ID = "client_" + strconv.Itoa(len(clients)+1)
+         🔹len(clients) → Conta quantos clientes já existem na lista clients.         
+         🔹+1 → Adiciona 1 ao total para garantir que o novo cliente tenha um ID único.         
+         🔹strconv.Itoa(len(clients)+1) → Converte esse número para uma string, pois len(clients)+1 é um inteiro (int) e precisa ser transformado em texto.       
+         🔹"client_" + ... → Adiciona o prefixo "client_" antes do número, criando um ID legível.        
+         🔹client.ID = ... → Atribui o ID gerado ao novo cliente, garantindo que ele tenha um identificador único na lista

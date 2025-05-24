@@ -1,9 +1,11 @@
 package main
 
 import (
-	"net/http"
-	"github.com/gorilla/mux"
 	"encoding/json"
+	"strconv"
+	"net/http"
+	"log"
+	"github.com/gorilla/mux"
 )
 type Person struct {
 	ID string `json:"id,omitempty"`
@@ -20,11 +22,11 @@ type Address struct {
 // Lista de pessoas (simulação de banco de dados)
 var clients []Person
 
-func GetClients(w http.ResponseWriter, r *http.Request) {
+func GetClients(w http.ResponseWriter, r *http.Request) { //EXIBE todos os usuarios 
     w.Header().Set("Content-Type", "application/json") // Define o tipo de resposta como JSON
     json.NewEncoder(w).Encode(clients) // Converte a lista de pessoas para JSON e envia na resposta
 }
-func GetClient(w http.ResponseWriter, r *http.Request) {
+func GetClient(w http.ResponseWriter, r *http.Request) { //EXIBE o usuario através do ID
 	params := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
 	
@@ -36,14 +38,38 @@ func GetClient(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(&Person{})
 }
+func CreateClient (w http.ResponseWriter, r *http.Request) {
+	var client Person
+	err := json.NewDecoder(r.Body).Decode(&client) //pega os dados de requisição do body(json), transforma os JSON em uma pessoa (Person)
+	if err != nil { //como eu adcionei a variavel err na linha de cima, e fiz o laço aqui, eu verifico se tem erros e informo ao usuário se houve ou não um problema
+		http.Error(w, "Erro ao processar JSON: formato inválido", http.StatusBadRequest)
+		return
+	}
+	//e armazena o objeto(a pessoa) convertido na variável client.
+
+	//🔹 json.NewDecoder(r.Body) cria um decodificador JSON que lê r.Body.
+	//🔹 .Decode(&person) transforma os dados JSON no objeto Person dentro do Go
+
+	client.ID = "client_" + strconv.Itoa(len(clients)+1) //Gera um ID automaticamente para o cliente, baseado no tamanho da lista clients.
+								 
+	clients = append(clients, client)
+	w.Header().Set("Content-Type", "application/json") //defino o formato da resposta
+	json.NewEncoder(w).Encode(client)
+}
+
 
 func main() {
 	router := mux.NewRouter()
 
 	//o router é a função que vai usar a porta, o handlefunc é pra acessar o local que vou direcionar
-	router.HandleFunc("/contact/", GetClients).Methods("GET") // Exibir todas as pessoas
+	router.HandleFunc("/contact", GetClients).Methods("GET") // Exibir todas as pessoas
 	router.HandleFunc("/contact/{id}", GetClient).Methods("GET") // Localizar pessoa por ID
-	//router.HandleFunc("/contact/") // Atualizar pessoa utiliza ID
+	router.HandleFunc("/contact", CreateClient).Methods("POST") // Criar pessoa
 	//router.HandleFunc("/contact/") // Deletar pessoa utiliza ID
-	http.ListenAndServe(":8000", router)
+	err := http.ListenAndServe(":8000", router)
+	if err != nil {
+    log.Fatal("Erro ao iniciar o servidor:", err)
+}
+
+
 }
