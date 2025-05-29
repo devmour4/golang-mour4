@@ -57,6 +57,21 @@ func CreateClient (w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(client)
 }
 
+func RemoveClient (w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
+	for index, item := range clients {
+		if item.ID == params["id"] { //compara o id do usuario com o da URL e ve se é o mesmo para que remova
+			clients = append(clients[:index], clients[index+1:]...) //Remove o client, com a função append utilizada em slices
+			w.WriteHeader(http.StatusOK) //define o código de status HTTP na resposta. No seu código, ela indica que a remoção do cliente foi bem-sucedida.
+			return
+		}
+		
+	}
+	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(clients)
+}
+
 
 func main() {
 	router := mux.NewRouter()
@@ -65,11 +80,12 @@ func main() {
 	router.HandleFunc("/contact", GetClients).Methods("GET") // Exibir todas as pessoas
 	router.HandleFunc("/contact/{id}", GetClient).Methods("GET") // Localizar pessoa por ID
 	router.HandleFunc("/contact", CreateClient).Methods("POST") // Criar pessoa
-	//router.HandleFunc("/contact/") // Deletar pessoa utiliza ID
+	router.HandleFunc("/contact/{id}",RemoveClient).Methods("DELETE") // Deletar pessoa utiliza ID
+	
 	err := http.ListenAndServe(":8000", router)
+	
 	if err != nil {
     log.Fatal("Erro ao iniciar o servidor:", err)
-}
-
+	}
 
 }
