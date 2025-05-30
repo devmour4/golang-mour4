@@ -56,7 +56,29 @@ func CreateClient (w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json") //defino o formato da resposta
 	json.NewEncoder(w).Encode(client)
 }
+func UpdateClient (w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
 
+	var updateClient Person
+	err := json.NewDecoder(r.Body).Decode(&updateClient)
+
+	if err != nil {
+		http.Error(w, "Erro ao processar o JSON: formato inválido", http.StatusBadRequest)
+		return
+	}
+	for index, item := range clients {
+		if item.ID == params["id"] {
+			updateClient.ID = item.ID
+			clients[index] = updateClient
+			json.NewEncoder(w).Encode(updateClient)
+		}
+
+		http.Error(w, "Cliente não encontrado", http.StatusNotFound)
+
+	}
+
+}
 func RemoveClient (w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
@@ -79,8 +101,10 @@ func main() {
 	router.HandleFunc("/contact", GetClients).Methods("GET") // Exibir todas as pessoas
 	router.HandleFunc("/contact/{id}", GetClient).Methods("GET") // Localizar pessoa por ID
 	router.HandleFunc("/contact", CreateClient).Methods("POST") // Criar pessoa
+	router.HandleFunc("/contact/{id}", UpdateClient).Methods("PUT") // Atualiza a pessoa pelo ID
 	router.HandleFunc("/contact/{id}",RemoveClient).Methods("DELETE") // Deletar pessoa utiliza ID
 	
+
 	clients = append(clients, Person{ID: "1", Firstname: "Abigail", Lastname: "Brithanny", Address: &Address{City: "São Paulo", State: "São Paulo"}})
 	clients = append(clients, Person{ID: "2", Firstname: "Josivaldo", Lastname: "Leite", Address: &Address{City: "Nova Friburgo", State: "Rio de Janeiro"}})
 
